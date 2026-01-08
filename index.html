@@ -293,9 +293,166 @@
         }
 
         function addToCalendarFeed() {
-            // Using webcal protocol to subscribe to the calendar feed
+            const icsUrl = 'https://to-masha.1-z.me/masha-calendar.ics';
             const webcalUrl = 'webcal://to-masha.1-z.me/masha-calendar.ics';
-            window.location.href = webcalUrl;
+            
+            // Detect platform
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            const isMobile = isIOS || isAndroid;
+            
+            if (isIOS) {
+                // iOS handles webcal:// well
+                window.location.href = webcalUrl;
+            } else if (isAndroid) {
+                // Android may need intent or fallback
+                try {
+                    // Try webcal first
+                    const newWindow = window.open(webcalUrl, '_blank');
+                    if (!newWindow) {
+                        // If popup blocked or webcal not supported, show instructions
+                        showCalendarFeedInstructions(icsUrl);
+                    }
+                } catch (e) {
+                    showCalendarFeedInstructions(icsUrl);
+                }
+            } else {
+                // Desktop browsers - try webcal first, fallback to instructions
+                try {
+                    const newWindow = window.open(webcalUrl, '_blank');
+                    if (!newWindow) {
+                        // If popup blocked, show instructions
+                        showCalendarFeedInstructions(icsUrl);
+                    }
+                } catch (e) {
+                    // Fallback to instructions for desktop
+                    showCalendarFeedInstructions(icsUrl);
+                }
+            }
+        }
+
+        function showCalendarFeedInstructions(icsUrl) {
+            const instructions = `To subscribe to this calendar feed:
+
+For most calendar apps (Google Calendar, Apple Calendar):
+• The calendar should open automatically
+
+For Outlook:
+1. Open Outlook
+2. Go to Calendar view
+3. Click "Add Calendar" → "Subscribe from web"
+4. Paste this URL: ${icsUrl}
+
+For other apps:
+• Copy this URL: ${icsUrl}
+• Look for "Add Calendar" or "Subscribe" in your calendar app
+• Paste the URL and subscribe`;
+
+            // Create a modal dialog instead of alert
+            showModalDialog('Calendar Feed Instructions', instructions, icsUrl);
+        }
+
+        function showModalDialog(title, message, icsUrl) {
+            // Remove any existing modal
+            const existingModal = document.querySelector('.modal-overlay');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Create modal elements
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.innerHTML = `
+                <div class="modal-content">
+                    <h3>${title}</h3>
+                    <pre>${message}</pre>
+                    <div class="modal-buttons">
+                        <button onclick="copyToClipboard('${icsUrl}')">Copy URL</button>
+                        <button onclick="closeModal()">Close</button>
+                    </div>
+                </div>
+            `;
+
+            // Add modal styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.7);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                }
+                .modal-content {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                }
+                .modal-content h3 {
+                    margin-top: 0;
+                    color: #333;
+                }
+                .modal-content pre {
+                    white-space: pre-wrap;
+                    font-family: inherit;
+                    margin: 15px 0;
+                    line-height: 1.5;
+                }
+                .modal-buttons {
+                    display: flex;
+                    gap: 10px;
+                    justify-content: flex-end;
+                }
+                .modal-buttons button {
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: 500;
+                }
+                .modal-buttons button:first-child {
+                    background: #667eea;
+                    color: white;
+                }
+                .modal-buttons button:last-child {
+                    background: #f8f9fa;
+                    color: #333;
+                }
+            `;
+
+            document.head.appendChild(style);
+            document.body.appendChild(modalOverlay);
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('URL copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('URL copied to clipboard!');
+            });
         }
     </script>
 </body>
