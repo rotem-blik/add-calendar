@@ -290,6 +290,7 @@
         function addToCalendarFeed() {
             // Use Gemini's suggested Native Webcal Link as fallback
             const icsUrl = 'to-masha.1-z.me/masha-calendar.ics'; // Exclude https://
+            const androidUrl = `https://www.google.com/calendar/render?cid=webcal://${icsUrl}`;
             const nativeWebcal = `webcal://${icsUrl}`;
             
             // Detect platform
@@ -300,8 +301,8 @@
                 // iOS handles webcal:// well
                 window.location.href = nativeWebcal;
             } else if (isAndroid) {
-                // Android: Show instructions since webcal:// handling is unreliable
-                showCalendarFeedInstructions(`https://${icsUrl}`);
+                //https://www.google.com/calendar/render?cid=webcal://to-masha.1-z.me/masha-calendar.ics
+                window.open(androidUrl, '_blank');
             } else {
                 // Desktop browsers - try webcal first, fallback to instructions
                 try {
