@@ -217,6 +217,16 @@
             return `${year}${month}${day}T${hours}${minutes}${seconds}`;
         }
 
+        function formatDateForGoogle(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
+        }
+
         function generateICS() {
             const startDate = formatDateForICS(flightEvent.departureDate);
             const endDate = formatDateForICS(flightEvent.returnDate);
@@ -257,7 +267,14 @@
         }
 
         function addToGoogleCalendar() {
-            downloadICS('flight-tlv-ams.ics');
+            const startDate = formatDateForGoogle(flightEvent.departureDate);
+            const endDate = formatDateForGoogle(flightEvent.returnDate);
+            const title = encodeURIComponent(`Flight: ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
+            const description = encodeURIComponent(`Flight from ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
+            const location = encodeURIComponent(flightEvent.departureLocation);
+            
+            const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDate}/${endDate}&details=${description}&location=${location}`;
+            window.open(googleUrl, '_blank');
         }
 
         function addToAppleCalendar() {
@@ -265,11 +282,18 @@
         }
 
         function addToOutlookCalendar() {
-            downloadICS('flight-tlv-ams.ics');
+            const startDate = flightEvent.departureDate.toISOString();
+            const endDate = flightEvent.returnDate.toISOString();
+            const title = encodeURIComponent(`Flight: ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
+            const description = encodeURIComponent(`Flight from ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
+            const location = encodeURIComponent(flightEvent.departureLocation);
+            
+            const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
+            window.open(outlookUrl, '_blank');
         }
 
         function addToCalendarFeed() {
-            // Using webcal protocol to open the calendar feed
+            // Using webcal protocol to subscribe to the calendar feed
             const webcalUrl = 'webcal://to-masha.1-z.me/masha-calendar.ics';
             window.location.href = webcalUrl;
         }
