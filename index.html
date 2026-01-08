@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Flight to Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .flight-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .flight-info h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .flight-detail {
+            margin: 10px 0;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .flight-detail strong {
+            color: #333;
+        }
+
+        .add-calendar-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .add-calendar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .add-calendar-btn:active {
+            transform: translateY(0);
+        }
+
+        .calendar-options {
+            display: none;
+            margin-top: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .calendar-options.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calendar-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .calendar-option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .calendar-option svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+        }
+
+        .calendar-option span {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .route {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✈️ Flight to Calendar</h1>
+        
+        <div class="flight-info">
+            <h2>Flight Details</h2>
+            <div class="route">TLV ✈️ AMS</div>
+            <div class="flight-detail">
+                <strong>Departure:</strong> May 21, 2026 at 21:00<br>
+                Tel Aviv (TLV)
+            </div>
+            <div class="flight-detail">
+                <strong>Return:</strong> May 23, 2026 at 05:00<br>
+                Amsterdam (AMS)
+            </div>
+        </div>
+
+        <button class="add-calendar-btn" onclick="toggleCalendarOptions()">
+            📅 Add To Calendar
+        </button>
+
+        <div class="calendar-options" id="calendarOptions">
+            <div class="calendar-option" onclick="addToGoogleCalendar()">
+                <svg viewBox="0 0 24 24" fill="#4285F4">
+                    <path d="M12,0C5.4,0,0,5.4,0,12s5.4,12,12,12s12-5.4,12-12S18.6,0,12,0z M17.1,13.5h-3.6v3.6h-3v-3.6H6.9v-3h3.6V6.9h3v3.6h3.6 V13.5z"/>
+                </svg>
+                <span>Google Calendar</span>
+            </div>
+            <div class="calendar-option" onclick="addToAppleCalendar()">
+                <svg viewBox="0 0 24 24" fill="#000">
+                    <path d="M17.6,13.8c0-3,2.5-4.5,2.6-4.5c-1.4-2.1-3.6-2.3-4.4-2.4c-1.9-0.2-3.6,1.1-4.6,1.1c-1,0-2.5-1.1-4.1-1.1 C4.5,6.9,2,8.8,2,12.5c0,1.9,0.7,3.9,1.6,5.8c0.8,1.6,1.5,2.9,2.7,2.9c1.5,0,2-1,3.7-1c1.7,0,2.1,1,3.7,1c1.5,0,1.8-1.2,2.5-2.4 c0.8-1.4,1.1-2.8,1.1-2.9C17.3,15.9,17.6,14.9,17.6,13.8z M14.7,5.3c0.7-0.8,1.1-2,1-3.3c-1,0-2.2,0.7-2.9,1.5 c-0.6,0.7-1.2,1.9-1,3C12.9,6.5,14,5.3,14.7,5.3z"/>
+                </svg>
+                <span>Apple Calendar</span>
+            </div>
+            <div class="calendar-option" onclick="addToOutlookCalendar()">
+                <svg viewBox="0 0 24 24" fill="#0078D4">
+                    <path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,17c-2.8,0-5-2.2-5-5s2.2-5,5-5s5,2.2,5,5 S14.8,17,12,17z"/>
+                </svg>
+                <span>Outlook Calendar</span>
+            </div>
+            <div class="calendar-option" onclick="addToCalendarFeed()">
+                <svg viewBox="0 0 24 24" fill="#FF6B35">
+                    <path d="M12.945 1.379l-.652.763c-.784.926-1.488 1.933-2.097 3.13l-.054.11c-.441.951-.773 1.938-1.008 3.005l-.052.266c-.21 1.072-.334 2.23-.334 3.47c0 6.627 5.373 12 12 12c1.24 0 2.398-.124 3.47-.334l.266-.052c1.067-.235 2.054-.567 3.005-1.008l.11-.054c1.197-.609 2.204-1.313 3.13-2.097l.763-.652l-.652-.763c-.784-.926-1.488-1.933-2.097-3.13l-.054-.11c-.441-.951-.773-1.938-1.008-3.005l-.052-.266c-.21-1.072-.334-2.23-.334-3.47c0-6.627-5.373-12-12-12c-1.24 0-2.398.124-3.47.334l-.266.052c-1.067.235-2.054.567-3.005 1.008l-.11.054c-1.197.609-2.204 1.313-3.13 2.097l-.763.652z"/>
+                </svg>
+                <span>Calendar Feed (webcal)</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Flight event details
+        const flightEvent = {
+            departureDate: new Date(2026, 4, 21, 21, 0), // Month is 0-indexed (0=Jan, 1=Feb, ..., 4=May)
+            returnDate: new Date(2026, 4, 23, 5, 0),
+            departureLocation: 'Tel Aviv (TLV)',
+            arrivalLocation: 'Amsterdam (AMS)'
+        };
+
+        function toggleCalendarOptions() {
+            const options = document.getElementById('calendarOptions');
+            options.classList.toggle('show');
+        }
+
+        function formatDateForICS(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+        }
+
+        function generateICS() {
+            const startDate = formatDateForICS(flightEvent.departureDate);
+            const endDate = formatDateForICS(flightEvent.returnDate);
+            
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Flight Calendar//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH',
+                'BEGIN:VEVENT',
+                `DTSTART:${startDate}`,
+                `DTEND:${endDate}`,
+                `SUMMARY:Flight: ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`,
+                `DESCRIPTION:Flight from ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`,
+                `LOCATION:${flightEvent.departureLocation}`,
+                'STATUS:CONFIRMED',
+                'SEQUENCE:0',
+                `UID:flight-tlv-ams-${Date.now()}@add-calendar.local`,
+                `DTSTAMP:${formatDateForICS(new Date())}`,
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\r\n');
+
+            return icsContent;
+        }
+
+        function downloadICS(filename) {
+            const icsContent = generateICS();
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+        }
+
+        function addToGoogleCalendar() {
+            downloadICS('flight-tlv-ams.ics');
+        }
+
+        function addToAppleCalendar() {
+            downloadICS('flight-tlv-ams.ics');
+        }
+
+        function addToOutlookCalendar() {
+            downloadICS('flight-tlv-ams.ics');
+        }
+
+        function addToCalendarFeed() {
+            // Using webcal protocol to open the calendar feed
+            const webcalUrl = 'webcal://to-masha.1-z.me/masha-calendar.ics';
+            window.location.href = webcalUrl;
+        }
+    </script>
+</body>
+</html>
