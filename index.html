@@ -196,7 +196,7 @@
     <script>
         // Flight event details
         const flightEvent = {
-            departureDate: new Date(2026, 4, 21, 21, 0), // Month is 0-indexed (4 = May)
+            departureDate: new Date(2026, 4, 21, 21, 0), // Month is 0-indexed (0=Jan, 1=Feb, ..., 4=May)
             returnDate: new Date(2026, 4, 23, 5, 0),
             departureLocation: 'Tel Aviv (TLV)',
             arrivalLocation: 'Amsterdam (AMS)'
@@ -235,7 +235,7 @@
                 `LOCATION:${flightEvent.departureLocation}`,
                 'STATUS:CONFIRMED',
                 'SEQUENCE:0',
-                `UID:flight-tlv-ams-${Date.now()}@calendar.com`,
+                `UID:flight-tlv-ams-${Date.now()}@add-calendar.local`,
                 `DTSTAMP:${formatDateForICS(new Date())}`,
                 'END:VEVENT',
                 'END:VCALENDAR'
