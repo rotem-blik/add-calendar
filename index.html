@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar POC - Add Events</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📅 Calendar POC</h1>
+            <p>Proof of Concept for Adding Calendar Events</p>
+        </header>
+
+        <main>
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <button id="prevMonth" class="nav-btn">‹</button>
+                    <h2 id="currentMonth"></h2>
+                    <button id="nextMonth" class="nav-btn">›</button>
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid">
+                    <div class="day-label">Sun</div>
+                    <div class="day-label">Mon</div>
+                    <div class="day-label">Tue</div>
+                    <div class="day-label">Wed</div>
+                    <div class="day-label">Thu</div>
+                    <div class="day-label">Fri</div>
+                    <div class="day-label">Sat</div>
+                </div>
+            </div>
+
+            <div class="events-section">
+                <h3>Add Event</h3>
+                <form id="eventForm">
+                    <div class="form-group">
+                        <label for="eventDate">Date:</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTitle">Event Title:</label>
+                        <input type="text" id="eventTitle" placeholder="Enter event title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTime">Time:</label>
+                        <input type="time" id="eventTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDescription">Description:</label>
+                        <textarea id="eventDescription" rows="3" placeholder="Event description (optional)"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Add Event</button>
+                </form>
+
+                <div class="events-list">
+                    <h3>Upcoming Events</h3>
+                    <div id="eventsList"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="calendar.js"></script>
+</body>
+</html>
