@@ -267,56 +267,30 @@
         }
 
         function addToGoogleCalendar() {
-            const startDate = formatDateForGoogle(flightEvent.departureDate);
-            const endDate = formatDateForGoogle(flightEvent.returnDate);
-            const title = encodeURIComponent(`Flight: ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
-            const description = encodeURIComponent(`Flight from ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
-            const location = encodeURIComponent(flightEvent.departureLocation);
-            
-            const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDate}/${endDate}&details=${description}&location=${location}`;
-            window.open(googleUrl, '_blank');
+            // Use Gemini's suggested Google Calendar "Force" Link for calendar subscription
+            const icsUrl = 'to-masha.1-z.me/masha-calendar.ics'; // Exclude https://
+            const googleLink = `https://www.google.com/calendar/render?cid=webcal://${icsUrl}`;
+            window.open(googleLink, '_blank');
         }
 
         function addToAppleCalendar() {
-            downloadICS('flight-tlv-ams.ics');
+            // Use Gemini's suggested Native Webcal Link for Apple Calendar
+            const icsUrl = 'to-masha.1-z.me/masha-calendar.ics'; // Exclude https://
+            const nativeWebcal = `webcal://${icsUrl}`;
+            window.location.href = nativeWebcal;
         }
 
         function addToOutlookCalendar() {
-            const startDate = flightEvent.departureDate.toISOString();
-            const endDate = flightEvent.returnDate.toISOString();
-            const title = encodeURIComponent(`Flight: ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
-            const description = encodeURIComponent(`Flight from ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
-            const location = encodeURIComponent(flightEvent.departureLocation);
-            
-            // Detect if mobile
-            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                // Try to open Outlook app on mobile
-                const outlookAppUrl = `ms-outlook://calendar/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
-                try {
-                    window.location.href = outlookAppUrl;
-                    // If app doesn't open, fallback to web after delay
-                    setTimeout(() => {
-                        if (document.hasFocus()) {
-                            const outlookWebUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
-                            window.open(outlookWebUrl, '_blank');
-                        }
-                    }, 2000);
-                } catch (e) {
-                    const outlookWebUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
-                    window.open(outlookWebUrl, '_blank');
-                }
-            } else {
-                // Desktop: Use web URL directly (outlook:// protocol not reliably registered)
-                const outlookWebUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
-                window.open(outlookWebUrl, '_blank');
-            }
+            // Use Gemini's suggested Outlook Web Link for calendar subscription
+            const icsUrl = 'to-masha.1-z.me/masha-calendar.ics'; // Include https://
+            const outlookLink = `https://outlook.office.com/calendar/addcalendar?url=https://${icsUrl}`;
+            window.open(outlookLink, '_blank');
         }
 
         function addToCalendarFeed() {
-            const icsUrl = 'https://to-masha.1-z.me/masha-calendar.ics';
-            const webcalUrl = 'webcal://to-masha.1-z.me/masha-calendar.ics';
+            // Use Gemini's suggested Native Webcal Link as fallback
+            const icsUrl = 'to-masha.1-z.me/masha-calendar.ics'; // Exclude https://
+            const nativeWebcal = `webcal://${icsUrl}`;
             
             // Detect platform
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -324,21 +298,21 @@
             
             if (isIOS) {
                 // iOS handles webcal:// well
-                window.location.href = webcalUrl;
+                window.location.href = nativeWebcal;
             } else if (isAndroid) {
                 // Android: Show instructions since webcal:// handling is unreliable
-                showCalendarFeedInstructions(icsUrl);
+                showCalendarFeedInstructions(`https://${icsUrl}`);
             } else {
                 // Desktop browsers - try webcal first, fallback to instructions
                 try {
-                    const newWindow = window.open(webcalUrl, '_blank');
+                    const newWindow = window.open(nativeWebcal, '_blank');
                     if (!newWindow) {
                         // If popup blocked, show instructions
-                        showCalendarFeedInstructions(icsUrl);
+                        showCalendarFeedInstructions(`https://${icsUrl}`);
                     }
                 } catch (e) {
                     // Fallback to instructions for desktop
-                    showCalendarFeedInstructions(icsUrl);
+                    showCalendarFeedInstructions(`https://${icsUrl}`);
                 }
             }
         }
