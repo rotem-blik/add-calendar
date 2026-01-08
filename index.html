@@ -288,8 +288,30 @@
             const description = encodeURIComponent(`Flight from ${flightEvent.departureLocation} to ${flightEvent.arrivalLocation}`);
             const location = encodeURIComponent(flightEvent.departureLocation);
             
-            const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
-            window.open(outlookUrl, '_blank');
+            // Detect if mobile
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Try to open Outlook app on mobile
+                const outlookAppUrl = `ms-outlook://calendar/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
+                try {
+                    window.location.href = outlookAppUrl;
+                    // If app doesn't open, fallback to web after delay
+                    setTimeout(() => {
+                        if (document.hasFocus()) {
+                            const outlookWebUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
+                            window.open(outlookWebUrl, '_blank');
+                        }
+                    }, 2000);
+                } catch (e) {
+                    const outlookWebUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
+                    window.open(outlookWebUrl, '_blank');
+                }
+            } else {
+                // Desktop: Use web URL directly (outlook:// protocol not reliably registered)
+                const outlookWebUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate}&enddt=${endDate}&body=${description}&location=${location}`;
+                window.open(outlookWebUrl, '_blank');
+            }
         }
 
         function addToCalendarFeed() {
@@ -299,23 +321,13 @@
             // Detect platform
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const isAndroid = /Android/.test(navigator.userAgent);
-            const isMobile = isIOS || isAndroid;
             
             if (isIOS) {
                 // iOS handles webcal:// well
                 window.location.href = webcalUrl;
             } else if (isAndroid) {
-                // Android may need intent or fallback
-                try {
-                    // Try webcal first
-                    const newWindow = window.open(webcalUrl, '_blank');
-                    if (!newWindow) {
-                        // If popup blocked or webcal not supported, show instructions
-                        showCalendarFeedInstructions(icsUrl);
-                    }
-                } catch (e) {
-                    showCalendarFeedInstructions(icsUrl);
-                }
+                // Android: Show instructions since webcal:// handling is unreliable
+                showCalendarFeedInstructions(icsUrl);
             } else {
                 // Desktop browsers - try webcal first, fallback to instructions
                 try {
@@ -332,10 +344,33 @@
         }
 
         function showCalendarFeedInstructions(icsUrl) {
-            const instructions = `To subscribe to this calendar feed:
-
-For most calendar apps (Google Calendar, Apple Calendar):
-• The calendar should open automatically
+            // Detect platform for specific instructions
+            const isAndroid = /Android/.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            let platformInstructions = '';
+            
+            if (isAndroid) {
+                platformInstructions = `
+For Android:
+1. Open your Calendar app (Google Calendar, Samsung Calendar, etc.)
+2. Look for menu (three dots) → Settings → Add calendar → Subscribe to calendar
+3. Paste this URL: ${icsUrl}`;
+            } else if (isIOS) {
+                platformInstructions = `
+For iOS:
+• The calendar should open automatically, or:
+1. Open Calendar app
+2. Tap Calendars at bottom
+3. Tap "Add Calendar" → "Subscribe to Calendar"
+4. Paste this URL: ${icsUrl}`;
+            } else {
+                platformInstructions = `
+For Google Calendar:
+1. Open Google Calendar
+2. Click the "+" button next to "Other calendars"
+3. Select "Subscribe to calendar"
+4. Paste this URL: ${icsUrl}
 
 For Outlook:
 1. Open Outlook
@@ -343,10 +378,12 @@ For Outlook:
 3. Click "Add Calendar" → "Subscribe from web"
 4. Paste this URL: ${icsUrl}
 
-For other apps:
+For other desktop apps:
 • Copy this URL: ${icsUrl}
-• Look for "Add Calendar" or "Subscribe" in your calendar app
-• Paste the URL and subscribe`;
+• Look for "Subscribe to calendar" or "Add internet calendar"`;
+            }
+
+            const instructions = `To subscribe to this calendar feed:${platformInstructions}`;
 
             // Create a modal dialog instead of alert
             showModalDialog('Calendar Feed Instructions', instructions, icsUrl);
@@ -366,8 +403,13 @@ For other apps:
                 <div class="modal-content">
                     <h3>${title}</h3>
                     <pre>${message}</pre>
+                    <div class="url-display">
+                        <strong>Calendar URL:</strong><br>
+                        <code>${icsUrl}</code>
+                    </div>
                     <div class="modal-buttons">
                         <button onclick="copyToClipboard('${icsUrl}')">Copy URL</button>
+                        <button onclick="window.open('${icsUrl}', '_blank')">Open URL</button>
                         <button onclick="closeModal()">Close</button>
                     </div>
                 </div>
@@ -407,10 +449,23 @@ For other apps:
                     margin: 15px 0;
                     line-height: 1.5;
                 }
+                .url-display {
+                    background: #f8f9fa;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin: 15px 0;
+                    border: 1px solid #dee2e6;
+                }
+                .url-display code {
+                    word-break: break-all;
+                    font-family: monospace;
+                    color: #007bff;
+                }
                 .modal-buttons {
                     display: flex;
                     gap: 10px;
                     justify-content: flex-end;
+                    flex-wrap: wrap;
                 }
                 .modal-buttons button {
                     padding: 8px 16px;
@@ -418,9 +473,14 @@ For other apps:
                     border-radius: 5px;
                     cursor: pointer;
                     font-weight: 500;
+                    min-width: 80px;
                 }
                 .modal-buttons button:first-child {
                     background: #667eea;
+                    color: white;
+                }
+                .modal-buttons button:nth-child(2) {
+                    background: #28a745;
                     color: white;
                 }
                 .modal-buttons button:last-child {
